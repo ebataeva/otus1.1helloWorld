@@ -5,6 +5,7 @@ from _csv import reader
 class Users:
 
     def __init__(self) -> None:
+        # self.index = 0
         self.new_users = []
         super().__init__()
 
@@ -13,13 +14,18 @@ class Users:
         new_users = []
         for i in users:
             new_users.append(
-                {'name': i['name'], 'gender': i['gender'], 'address': i['address'], 'age': i['age'], 'books': []})
+                {'name': i['name'], 'gender': i['gender'],
+                 'address': i['address'], 'age': i['age'], 'books': []})
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.new_users.index()
+        if self.index >= len(self.new_users):
+            self.index = 0
+        result = self.new_users[self.index]
+        self.index += 1
+        return result
 
 
 class Books:
@@ -43,7 +49,7 @@ class Main(Users, Books):
     least = count_books / count_users
     print(count_books, count_users, least)
     print(next(iter(Users.new_users)))
-    for i in range(len(Users.new_users) + 5):
+    for i in range(len(Users.new_users)+1):
         print(Users.new_users[i])
 
     with open('result_json.json', 'w') as result:
