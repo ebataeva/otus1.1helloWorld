@@ -6,6 +6,7 @@ class Users:
 
     def __init__(self) -> None:
         self.new_users = []
+        self.index = 0
         super().__init__()
 
     with open('users.json', 'r') as json_data:
