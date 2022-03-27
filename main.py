@@ -1,57 +1,49 @@
+import csv
 import json
-from _csv import reader
 
 
 class Users:
+    with open("users.json", 'r') as json_file:
+        json_data = json.loads(json_file.read())
 
-    def __init__(self) -> None:
-        self.new_users = []
-        self.index = 0
-        super().__init__()
+    json_list = []
+    for i in json_data:
+        json_list.append({'name': i['name'], 'gender': i['gender'], 'age': i['age'], 'address': i['address']})
 
-    with open('users.json', 'r') as json_data:
-        users = json.load(json_data)
-        new_users = []
-        for i in users:
-            new_users.append(
-                {'name': i['name'], 'gender': i['gender'], 'address': i['address'], 'age': i['age'], 'books': []})
+    with open('books.csv', newline='') as csv_file:
+        reader = csv.reader(csv_file)
+        header = next(reader)
+        csv_list = []
+        for row in reader:
+            csv_list.append(dict(zip(header, row)))
 
-    def __iter__(self):
-        return self
+    result_list = []
+    for json_el in json_list:
+        result_list.append(
+            {
+                "name": json_el['name'],
+                "gender": json_el['gender'],
+                "address": json_el['address'],
+                "age": json_el['age'],
+                "books": []
+            }
+        )
 
-    def __next__(self):
-        if self.index >= len(self.new_users):
-            self.index = 0
+    readers_count = len(result_list)
+    reader_index = 0
+    for csv_el in csv_list:
+        result_list[reader_index]['books'].append(
+            {
+                "title": csv_el['Title'],
+                "author": csv_el['Author'],
+                "pages": int(csv_el['Pages']),
+                "genre": csv_el['Genre']
+            }
+        )
+        reader_index += 1
+        if reader_index >= readers_count:
+            reader_index = 0
 
-        result = self.new_users[self.index]
-        self.index += 1
-        return result
-
-
-class Books:
-    with open('books.csv') as csv_data:
-        header = next(reader(csv_data))
-        new_books = []
-        for row in reader(csv_data):
-            new_books.append(dict(zip(header, row)))
-
-
-class Main(Users, Books):
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    Users.new_users[0]['books'].append(dict(Books.new_books[0]))
-
-    print(Users.new_users[0])
-    count_books = len(Books.new_books)
-    count_users = len(Users.new_users)
-    least = count_books / count_users
-    print(count_books, count_users, least)
-    print(next(iter(Users.new_users)))
-    for i in range(len(Users.new_users) + 5):
-        print(Users.new_users[i])
-
-    with open('result_json.json', 'w') as result:
-        result_data = json.dumps(Users.new_users, indent=4)
-        result.write(result_data)
+    with open('result.json', 'w') as result_json:
+        result_data = json.dumps(result_list, indent=4)
+        result_json.write(result_data)
